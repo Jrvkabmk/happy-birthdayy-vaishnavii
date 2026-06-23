@@ -1,0 +1,625 @@
+!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Happy Birthday Vaishnavi 🎂❤️</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=Dancing+Script:wght@500;700&family=Lora:ital@0;1&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root { --cherry:#8B0000; --ink:#3D0000; --moon:#FFF0A0; --moon-glow:#FFE066; }
+  body { background:var(--cherry); font-family:'Lora',serif; min-height:100vh; overflow-x:hidden; }
+
+  .screen { display:none; width:100%; min-height:100vh; }
+  .screen.active { display:flex; }
+
+  /* MOON */
+  .moon-el {
+    position:absolute; border-radius:50%;
+    background:radial-gradient(circle at 33% 33%, var(--moon) 0%, var(--moon-glow) 55%, #d4a800 100%);
+    animation:moonFloat 6s ease-in-out infinite;
+  }
+  @keyframes moonFloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-9px)} }
+
+  /* STARS */
+  .stars { position:absolute; inset:0; pointer-events:none; }
+  .star  { position:absolute; background:#fff; border-radius:50%; animation:twinkle 2s ease-in-out infinite; }
+  @keyframes twinkle { 0%,100%{opacity:.22;transform:scale(1)} 50%{opacity:.9;transform:scale(1.5)} }
+
+  /* POP */
+  #pop-layer { position:fixed; inset:0; pointer-events:none; z-index:999; overflow:hidden; }
+  .pop-item  { position:absolute; animation:popFly 2.2s ease-out forwards; opacity:0; }
+  @keyframes popFly {
+    0%  {opacity:0; transform:translate(0,0) scale(.2) rotate(0deg);}
+    15% {opacity:1; transform:translate(var(--dx1),var(--dy1)) scale(1.15) rotate(var(--r1));}
+    80% {opacity:1; transform:translate(var(--dx2),var(--dy2)) scale(.9)  rotate(var(--r2));}
+    100%{opacity:0; transform:translate(var(--dx3),var(--dy3)) scale(.5)  rotate(var(--r3));}
+  }
+
+  /* MUSIC BTN */
+  .music-note {
+    position:fixed; top:14px; right:14px; z-index:1000;
+    background:rgba(0,0,0,.22); color:#fff;
+    border:1px solid rgba(255,255,255,.18); border-radius:28px;
+    padding:6px 13px; cursor:pointer; font-size:.82rem; font-family:'Lora',serif;
+    transition:background .2s;
+  }
+  .music-note:hover { background:rgba(0,0,0,.4); }
+
+  /* ───── SCREEN 1 – ENVELOPE ───── */
+  #screen-envelope {
+    background:radial-gradient(ellipse at 65% 75%, #3a0000 0%, #8B0000 45%, #5a0000 100%);
+    align-items:center; justify-content:center; flex-direction:column;
+    position:relative; overflow:hidden;
+  }
+  .envelope-wrap { position:relative; cursor:pointer; display:flex; flex-direction:column; align-items:center; }
+
+  .envelope {
+    width:300px; height:200px; position:relative;
+    filter:drop-shadow(0 18px 45px rgba(0,0,0,.55));
+    transition:transform .3s;
+  }
+  .envelope-wrap:hover .envelope { transform:scale(1.04) rotate(-1deg); }
+
+  .env-body { position:absolute; inset:0; background:linear-gradient(150deg,#b00010 0%,#8B0000 55%,#6B0000 100%); border-radius:6px; }
+  .env-flap { position:absolute; top:0; left:0; right:0; height:52%; overflow:hidden; transform-origin:top center; transition:transform .75s cubic-bezier(.4,0,.2,1); z-index:6; }
+  .env-flap-shape { width:100%; height:100%; background:linear-gradient(160deg,#ffffff 0%,#fff5f6 70%,#fde0e6 100%); clip-path:polygon(0% 0%,100% 0%,50% 100%); }
+  .envelope-wrap.open .env-flap { transform:rotateX(-172deg); }
+  .env-left  { position:absolute; top:0; left:0;  width:0; height:0; z-index:3; border-left:150px solid #7a0000; border-top:100px solid transparent; border-bottom:100px solid transparent; }
+  .env-right { position:absolute; top:0; right:0; width:0; height:0; z-index:3; border-right:150px solid #7a0000; border-top:100px solid transparent; border-bottom:100px solid transparent; }
+  .env-bot   { position:absolute; bottom:0; left:0; right:0; height:55%; z-index:2; background:linear-gradient(180deg,#9a0010 0%,#6B0000 100%); clip-path:polygon(0% 100%,50% 0%,100% 100%); }
+
+  /* BOW – floats freely in center */
+  .bow-emoji {
+    position:fixed; font-size:3.8rem;
+    top:50%; left:50%; transform:translate(-50%,-50%);
+    z-index:20; pointer-events:none;
+    animation:bowFloat 3.5s ease-in-out infinite;
+    filter:drop-shadow(0 4px 16px rgba(0,0,0,.35));
+  }
+  @keyframes bowFloat {
+    0%  { transform:translate(-50%,-50%) scale(1)    rotate(-4deg); }
+    25% { transform:translate(-50%,-56%) scale(1.07) rotate(2deg);  }
+    50% { transform:translate(-50%,-52%) scale(1.12) rotate(-2deg); }
+    75% { transform:translate(-50%,-58%) scale(1.05) rotate(3deg);  }
+    100%{ transform:translate(-50%,-50%) scale(1)    rotate(-4deg); }
+  }
+
+  .tap-hint {
+    margin-top:16px; color:rgba(255,210,215,.7);
+    font-size:.7rem; letter-spacing:.18em;
+    font-family:'Lora',serif; font-style:italic;
+    animation:blink 2.2s ease-in-out infinite;
+  }
+  @keyframes blink { 0%,100%{opacity:.35} 50%{opacity:1} }
+
+  /* ───── SCREEN 2 – TITLE ───── */
+  #screen-title {
+    background:radial-gradient(ellipse at 30% 20%, #3a0000 0%, #8B0000 50%, #5a0000 100%);
+    flex-direction:column; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; animation:fadeIn .9s ease;
+  }
+  @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+
+  .float-item { position:absolute; font-size:1.4rem; pointer-events:none; animation:floatAround linear infinite; opacity:.42; }
+  @keyframes floatAround {
+    0%  {transform:translateY(0)     rotate(0deg)   scale(1);   opacity:.25;}
+    50% {transform:translateY(-28px) rotate(180deg) scale(1.1); opacity:.55;}
+    100%{transform:translateY(0)     rotate(360deg) scale(1);   opacity:.25;}
+  }
+
+  .title-card {
+    background:linear-gradient(170deg,#fff8f8 0%,#ffeaed 100%);
+    border-radius:26px 26px 55% 55% / 26px 26px 38px 38px;
+    padding:38px 34px 48px; text-align:center; max-width:330px; width:90%;
+    box-shadow:0 8px 40px rgba(0,0,0,.35), inset 0 1px 0 rgba(255,255,255,.8);
+    position:relative;
+  }
+  .title-card::before {
+    content:''; position:absolute; inset:-3px;
+    border-radius:28px 28px 57% 57% / 28px 28px 40px 40px;
+    background:linear-gradient(135deg,#e05080,#8B0000,#e05080); z-index:-1;
+  }
+  .surprise-label { font-family:'Dancing Script',cursive; color:#b00030; font-size:.88rem; letter-spacing:.1em; margin-bottom:8px; opacity:.8; }
+  .title-heading  { font-family:'Playfair Display',serif; font-size:1.6rem; line-height:1.25; color:#6B0000; margin-bottom:6px; }
+  .title-name {
+    font-family:'Dancing Script',cursive; font-size:2.1rem; font-weight:700;
+    background:linear-gradient(135deg,#8B0000,#e05070,#8B0000);
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent; background-clip:text;
+    display:block; margin-top:4px; animation:shimmer 3s linear infinite; background-size:200% auto;
+  }
+  @keyframes shimmer { to{background-position:200% center;} }
+  .title-hearts { font-size:1.25rem; margin:10px 0; animation:heartbeat 1.4s ease-in-out infinite; }
+  @keyframes heartbeat { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
+  .open-btn {
+    margin-top:18px; background:linear-gradient(135deg,#8B0000,#c0304a);
+    color:#fff; border:none; border-radius:28px; padding:11px 32px;
+    font-family:'Dancing Script',cursive; font-size:1.1rem;
+    cursor:pointer; box-shadow:0 4px 18px rgba(139,0,0,.4); transition:all .25s;
+  }
+  .open-btn:hover { transform:translateY(-2px); box-shadow:0 8px 28px rgba(139,0,0,.5); }
+
+  /* ───── SCREEN 3 – BOOK ───── */
+  #screen-book {
+    background:radial-gradient(ellipse at 50% 30%, #3a0000 0%, #8B0000 55%, #5a0000 100%);
+    flex-direction:column; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; padding:20px 0;
+  }
+  .book-float { position:absolute; pointer-events:none; font-size:1.3rem; animation:floatAround linear infinite; opacity:.26; }
+
+  .book-outer {
+    display:flex; align-items:center; justify-content:center;
+    width:100%; gap:0;
+  }
+
+  .paw-btn {
+    flex-shrink:0; width:46px; height:46px;
+    background:rgba(255,255,255,.12); border:2px solid rgba(255,255,255,.25);
+    border-radius:50%; font-size:1.45rem;
+    display:flex; align-items:center; justify-content:center;
+    cursor:pointer; transition:background .2s, transform .2s;
+    box-shadow:0 2px 10px rgba(0,0,0,.3);
+  }
+  .paw-btn:hover { background:rgba(255,255,255,.28); transform:scale(1.18) rotate(12deg); }
+  .paw-btn.hidden { visibility:hidden; pointer-events:none; }
+
+  .page {
+    width:min(320px,72vw); min-height:440px;
+    background:repeating-linear-gradient(to bottom, #fff8f8 0px, #fff8f8 28px, #f0c8d0 29px, #f0c8d0 30px);
+    border-radius:3px 12px 12px 3px; padding:26px 22px 52px 54px;
+    position:relative; box-shadow:3px 4px 28px rgba(0,0,0,.4), -2px 0 10px rgba(0,0,0,.1);
+    animation:pageIn .38s ease both; flex-shrink:0;
+  }
+  @keyframes pageIn {
+    from{opacity:0; transform:translateX(30px) rotateY(15deg);}
+    to  {opacity:1; transform:translateX(0)    rotateY(0);}
+  }
+  .page::before {
+    content:''; position:absolute; left:42px; top:0; bottom:0; width:2px;
+    background:rgba(190,30,50,.25);
+  }
+  .page-text { font-family:'Lora',serif; font-size:.875rem; line-height:1.9; color:var(--ink); }
+  .page-text p { margin-bottom:12px; }
+  .page-num { position:absolute; bottom:14px; right:18px; font-size:.68rem; color:#c06070; font-family:'Dancing Script',cursive; }
+
+  .surprise-btn {
+    display:block; margin:14px auto 0;
+    background:linear-gradient(135deg,#8B0000,#c0304a);
+    color:#fff; border:none; border-radius:20px; padding:10px 26px;
+    font-family:'Dancing Script',cursive; font-size:1.1rem;
+    cursor:pointer; box-shadow:0 4px 16px rgba(139,0,0,.4); transition:all .25s;
+  }
+  .surprise-btn:hover { transform:translateY(-2px) scale(1.04); }
+
+  /* ── PAGE 3 inline photo (inside the notebook page) ── */
+  .inline-photo-wrap {
+    display:flex; flex-direction:column; align-items:center;
+    margin: 8px 0 4px;
+  }
+  .inline-photo-frame {
+    width:150px; height:180px; position:relative; cursor:pointer;
+  }
+  .inline-photo-frame img.inline-photo-img {
+    width:150px; height:180px; object-fit:cover;
+    border-radius:40% 40% 38% 38% / 35% 35% 48% 48%;
+    border:3px solid rgba(255,255,255,.9);
+    box-shadow:0 0 22px rgba(255,150,180,.5),0 4px 18px rgba(0,0,0,.3);
+    animation:photoPulse 4s ease-in-out infinite;
+    display:none;
+  }
+  .inline-photo-placeholder {
+    width:150px; height:180px;
+    border-radius:40% 40% 38% 38% / 35% 35% 48% 48%;
+    border:3px dashed rgba(139,0,0,.4);
+    background:linear-gradient(160deg,#ffe0ea,#ffc8d8);
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+    text-align:center; padding:12px; color:#8B0000; cursor:pointer;
+    animation:photoPulse 4s ease-in-out infinite;
+    font-family:'Dancing Script',cursive; font-size:.82rem;
+  }
+  @keyframes photoPulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.025)} }
+  #inline-photo-input { display:none; }
+
+  /* ───── SCREEN 4 – CAT GIFs ───── */
+  #screen-cats {
+    background:radial-gradient(ellipse at 50% 30%,#3a0000 0%,#8B0000 55%,#5a0000 100%);
+    flex-direction:column; align-items:center; justify-content:center;
+    position:relative; overflow:hidden; padding:24px 16px;
+  }
+  .cats-float { position:absolute; pointer-events:none; font-size:1.2rem; animation:floatUp linear infinite; opacity:.4; }
+  @keyframes floatUp { 0%{transform:translateY(0) scale(1);opacity:.4} 100%{transform:translateY(-110vh) scale(.7);opacity:0} }
+
+  /* center photo on cats screen */
+  .cats-center-photo {
+    width:160px; height:190px; object-fit:cover;
+    border-radius:50% 50% 48% 48% / 42% 42% 58% 58%;
+    border:4px solid rgba(255,255,255,.88);
+    box-shadow:0 0 40px rgba(255,180,200,.4),0 8px 32px rgba(0,0,0,.3);
+    animation:photoPulse 4s ease-in-out infinite;
+    position:relative; z-index:2;
+    display:none; /* shown by JS after photo loaded */
+  }
+  .cats-center-placeholder {
+    width:160px; height:190px;
+    border-radius:50% 50% 48% 48% / 42% 42% 58% 58%;
+    border:4px solid rgba(255,255,255,.6);
+    background:linear-gradient(160deg,#ffe0ea,#ffc0d0);
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Dancing Script',cursive; font-size:.9rem; color:#8B0000;
+    text-align:center; padding:14px;
+    animation:photoPulse 4s ease-in-out infinite;
+  }
+
+  /* 4 cat GIFs fixed in each corner */
+  .corner-cat {
+    position:absolute;
+    width:90px; height:90px;
+    object-fit:contain;
+    border-radius:14px;
+    box-shadow:0 4px 18px rgba(0,0,0,.35);
+    animation:cornerBob ease-in-out infinite;
+    z-index:5;
+  }
+  .corner-cat.top-left     { top:16px;    left:12px;  animation-duration:3.1s; }
+  .corner-cat.top-right    { top:16px;    right:12px; animation-duration:3.7s; animation-delay:-.8s; }
+  .corner-cat.bot-left     { bottom:16px; left:12px;  animation-duration:2.8s; animation-delay:-1.2s; }
+  .corner-cat.bot-right    { bottom:16px; right:12px; animation-duration:3.4s; animation-delay:-.4s; }
+  @keyframes cornerBob {
+    0%,100%{ transform:translateY(0)    rotate(-3deg) scale(1); }
+    50%    { transform:translateY(-10px) rotate(3deg)  scale(1.06); }
+  }
+
+  /* heart label under each cat */
+  .corner-cat-label {
+    position:absolute; font-size:.7rem;
+    font-family:'Dancing Script',cursive; color:rgba(255,200,220,.9);
+    text-align:center; width:90px;
+  }
+  .corner-cat-label.top-left  { top:116px; left:12px; }
+  .corner-cat-label.top-right { top:116px; right:12px; }
+  .corner-cat-label.bot-left  { bottom:106px; left:12px; }
+  .corner-cat-label.bot-right { bottom:106px; right:12px; }
+
+  .cats-caption {
+    margin-top:18px; text-align:center;
+    font-family:'Dancing Script',cursive; font-size:1.3rem;
+    color:rgba(255,220,230,.92); text-shadow:0 2px 8px rgba(0,0,0,.4);
+    z-index:3; position:relative;
+  }
+
+  .back-btn {
+    position:absolute; top:16px; left:16px;
+    background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.22);
+    color:rgba(255,220,230,.9); border-radius:20px; padding:7px 18px; cursor:pointer;
+    font-family:'Dancing Script',cursive; font-size:1rem; transition:all .2s;
+    z-index:10;
+  }
+  .back-btn:hover { background:rgba(255,255,255,.28); }
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     🎵 MUSIC — paste your music file path in src=""
+     Example: src="my-song.mp3"  or  src="music/love.mp3"
+     ══════════════════════════════════════════ -->
+<audio id="bgMusic" loop>
+  <source src="music" type="audio/mpeg">
+  <!-- ☝️ PUT YOUR MUSIC FILE PATH HERE ☝️ -->
+</audio>
+
+<button class="music-note" id="musicBtn" onclick="toggleMusic()">🎵 Music</button>
+<div id="pop-layer"></div>
+
+<!-- ═══ SCREEN 1 – ENVELOPE ═══ -->
+<div class="screen active" id="screen-envelope">
+  <div class="moon-el" style="width:105px;height:105px;top:28px;left:36px;box-shadow:0 0 38px 18px rgba(255,230,70,.22),0 0 75px 36px rgba(255,230,70,.07)"></div>
+  <div class="stars" id="stars"></div>
+
+  <!-- 🎀 bow floats freely in center -->
+  <div class="bow-emoji" id="floatingBow">🎀</div>
+
+  <div class="envelope-wrap" id="envelopeWrap" onclick="openEnvelope()">
+    <div class="envelope">
+      <div class="env-body"></div>
+      <div class="env-flap" id="envFlap"><div class="env-flap-shape"></div></div>
+      <div class="env-left"></div>
+      <div class="env-right"></div>
+      <div class="env-bot"></div>
+    </div>
+    <div class="tap-hint">tap to open ✉️</div>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 2 – TITLE ═══ -->
+<div class="screen" id="screen-title">
+  <div class="moon-el" style="width:88px;height:88px;bottom:28px;right:36px;box-shadow:0 0 36px 14px rgba(255,230,70,.2)"></div>
+  <div class="stars" id="stars2"></div>
+  <span class="float-item" style="top:8%;left:5%;animation-duration:7s;animation-delay:-1s">🌸</span>
+  <span class="float-item" style="top:14%;right:8%;animation-duration:9s;animation-delay:-3s">💕</span>
+  <span class="float-item" style="bottom:18%;left:7%;animation-duration:8s;animation-delay:-2s">🐱</span>
+  <span class="float-item" style="bottom:11%;right:10%;animation-duration:10s;animation-delay:-5s">🌺</span>
+  <span class="float-item" style="top:42%;left:3%;animation-duration:6s;animation-delay:-.5s">✨</span>
+  <span class="float-item" style="top:58%;right:4%;animation-duration:11s;animation-delay:-4s">🌸</span>
+
+  <div class="title-card">
+    <div class="surprise-label">✨ a little surprise for you ✨</div>
+    <h1 class="title-heading">Happy Birthday to my dear</h1>
+    <span class="title-name">Vaishnavi 🎂</span>
+    <div class="title-hearts">❤️ 🐱 🌸 💕 🌙</div>
+    <p style="font-size:.82rem;color:#a04060;font-style:italic;margin-top:4px;line-height:1.5;">Something very special is waiting for you inside…</p>
+    <button class="open-btn" onclick="goToBook()">Open my letter 💌</button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 3 – BOOK (4 pages) ═══ -->
+<div class="screen" id="screen-book">
+  <div class="moon-el" style="width:66px;height:66px;top:18px;left:26px;box-shadow:0 0 28px 10px rgba(255,230,70,.18)"></div>
+  <span class="book-float" style="top:6%;left:4%;animation-duration:8s">🌸</span>
+  <span class="book-float" style="top:10%;right:5%;animation-duration:11s;animation-delay:-3s">💕</span>
+  <span class="book-float" style="bottom:8%;left:5%;animation-duration:9s;animation-delay:-1s">🐱</span>
+  <span class="book-float" style="bottom:13%;right:4%;animation-duration:7s;animation-delay:-4s">🌺</span>
+  <span class="book-float" style="top:50%;left:2%;animation-duration:13s;animation-delay:-6s">✨</span>
+  <span class="book-float" style="top:32%;right:3%;animation-duration:10s;animation-delay:-2s">🌙</span>
+
+  <div class="book-outer">
+    <button class="paw-btn hidden" id="pawPrev" onclick="prevPage()">🐾</button>
+    <div id="pageCard" class="page">
+      <div class="page-text" id="pageText"></div>
+      <div class="page-num"  id="pageNum"></div>
+    </div>
+    <button class="paw-btn" id="pawNext" onclick="nextPage()">🐾</button>
+  </div>
+</div>
+
+<!-- ═══ SCREEN 4 – CAT GIFs + Vaishnavi's photo in center ═══ -->
+<div class="screen" id="screen-cats">
+  <div class="moon-el" style="width:76px;height:76px;bottom:22px;right:28px;box-shadow:0 0 30px 10px rgba(255,230,70,.2)"></div>
+  <button class="back-btn" onclick="goToBook()">← back to letter</button>
+
+  <!-- floating background emojis -->
+  <span class="cats-float" style="left:8%;animation-duration:8s">🌸</span>
+  <span class="cats-float" style="left:22%;animation-duration:11s;animation-delay:-3s">💕</span>
+  <span class="cats-float" style="left:75%;animation-duration:9s;animation-delay:-1s">🌺</span>
+  <span class="cats-float" style="left:88%;animation-duration:7s;animation-delay:-4s">✨</span>
+  <span class="cats-float" style="left:50%;animation-duration:10s;animation-delay:-2s">🌸</span>
+
+  <!-- ══════════════════════════════════════════
+       🐱 CAT GIFs — paste your GIF file paths in src=""
+       Each one sits in a corner admiring her photo
+       ══════════════════════════════════════════ -->
+
+  <!-- TOP-LEFT cat GIF -->
+  <img class="corner-cat top-left"
+       src="cat1.gif"
+       alt="🐱"
+       onerror="this.style.fontSize='3rem';this.style.background='transparent';this.replaceWith(Object.assign(document.createElement('div'),{className:'corner-cat top-left',textContent:'🐱',style:'display:flex;align-items:center;justify-content:center;font-size:3rem;border-radius:14px;'}))"
+  >
+  <!-- ☝️ CAT GIF 1 — src="your-cat1.gif" -->
+
+  <!-- TOP-RIGHT cat GIF -->
+  <img class="corner-cat top-right"
+       src="cat2.gif"
+       alt="🐱"
+       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'corner-cat top-right',textContent:'🐱',style:'display:flex;align-items:center;justify-content:center;font-size:3rem;border-radius:14px;'}))"
+  >
+  <!-- ☝️ CAT GIF 2 — src="your-cat2.gif" -->
+
+  <!-- BOTTOM-LEFT cat GIF -->
+  <img class="corner-cat bot-left"
+       src="cat3.gif"
+       alt="🐱"
+       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'corner-cat bot-left',textContent:'🐱',style:'display:flex;align-items:center;justify-content:center;font-size:3rem;border-radius:14px;'}))"
+  >
+  <!-- ☝️ CAT GIF 3 — src="your-cat3.gif" -->
+
+  <!-- BOTTOM-RIGHT cat GIF -->
+  <img class="corner-cat bot-right"
+       src="cat4.gif"
+       alt="🐱"
+       onerror="this.replaceWith(Object.assign(document.createElement('div'),{className:'corner-cat bot-right',textContent:'🐱',style:'display:flex;align-items:center;justify-content:center;font-size:3rem;border-radius:14px;'}))"
+  >
+  <!-- ☝️ CAT GIF 4 — src="your-cat4.gif" -->
+
+  <!-- little heart labels -->
+  <div class="corner-cat-label top-left">admiring 😻</div>
+  <div class="corner-cat-label top-right">😻 in awe</div>
+  <div class="corner-cat-label bot-left">so pretty 💕</div>
+  <div class="corner-cat-label bot-right">❤️ gorgeous</div>
+
+  <!-- CENTER — Vaishnavi's photo (auto-copies from page 3) -->
+  <img  id="catsPhoto"      class="cats-center-photo" src="" alt="Vaishnavi">
+  <div  id="catsPlaceholder" class="cats-center-placeholder">
+    📸<br>add photo on<br>page 3 first 🌸
+  </div>
+
+  <div class="cats-caption">my most beautiful girl 🌙<br>forever mine, Vaishnavi ❤️</div>
+</div>
+
+<script>
+// ── PAGE DATA ──
+// Page 1 – letter
+// Page 2 – letter
+// Page 3 – photo of Vaishnavi (inline in the notebook)
+// Page 4 – final love message + "wanna see something more?" button
+
+const pages = [
+  {
+    num: "🐾 1",
+    html: `
+      <p>Happy 18th Birthday, my precious wife, Vaishnavi. ❤️🎂</p>
+      <p>Today is such a special day because the most amazing person in my life turns 18. I don't think I'll ever be able to put into words how much you mean to me.</p>
+      <p>Thank you for always loving me, caring for me, adoring me, and most importantly, accepting me for who I am. Through everything, you've made me feel loved, valued, and cherished — and that's something I will always be grateful for.</p>
+    `
+  },
+  {
+    num: "🐾 2",
+    html: `
+      <p>You are one of the strongest people I know. No matter how much life has thrown at you, you've kept moving forward and kept doing your best, and I admire that so much.</p>
+      <p>I am so proud of the person you are becoming. Your heart is kinder than the gentlest breeze, and your smile shines brighter than the stars.</p>
+      <p>Even the moon would be jealous of your beauty — because whenever I look at it, it reminds me of you: calm, comforting, and breathtakingly beautiful. 🌙✨</p>
+    `
+  },
+  {
+    num: "🐾 3",
+    html: `
+      <p style="text-align:center;font-family:'Dancing Script',cursive;font-size:.95rem;color:#8B0000;margin-bottom:10px;">my favorite person 🌸</p>
+
+      <div class="inline-photo-wrap">
+        <div class="inline-photo-frame" onclick="document.getElementById('inline-photo-input').click()">
+          <img  id="inlinePhotoImg"   class="inline-photo-img" src="" alt="Vaishnavi">
+          <div  id="inlinePlaceholder" class="inline-photo-placeholder">
+            🌸<br>tap to add<br>your photo 📸
+          </div>
+        </div>
+      </div>
+
+      <input type="file" id="inline-photo-input" accept="image/*" onchange="loadInlinePhoto(event)">
+
+      <p style="margin-top:10px;text-align:center;font-size:.78rem;color:#a04060;font-style:italic;">
+        Congratulations on becoming 18, my love. I hope this new chapter of your life brings you endless happiness, success, and all the love you deserve. 🫶
+      </p>
+    `
+  },
+  {
+    num: "🐾 4",
+    html: `
+      <p>I love you so muchhhhh, Vaishnaviiiiii. ❤️🫶</p>
+      <p>Forever and always, my precious wife. 🌙✨</p>
+      <p style="margin-top:14px;font-family:'Dancing Script',cursive;font-size:1.08rem;color:#8B0000;text-align:center;">
+        You are my moon, my stars, my everything.<br>Happy 18th, my love. 🌸🐱💕
+      </p>
+      <div style="text-align:center;margin-top:16px;font-size:1.45rem;animation:heartbeat 1.4s ease-in-out infinite;display:inline-block;width:100%">
+        ❤️ 🌙 🌸 🐱 ✨ 💕
+      </div>
+      <button class="surprise-btn" onclick="goToCats()" style="margin-top:20px;">
+        🐱 wanna see something more? 🌸
+      </button>
+    `
+  }
+];
+
+let currentPage = 0;
+
+function renderPage() {
+  const card = document.getElementById('pageCard');
+  card.style.animation = 'none';
+  void card.offsetWidth;
+  card.style.animation = '';
+  document.getElementById('pageText').innerHTML = pages[currentPage].html;
+  document.getElementById('pageNum').textContent  = pages[currentPage].num;
+  document.getElementById('pawPrev').classList.toggle('hidden', currentPage === 0);
+  document.getElementById('pawNext').classList.toggle('hidden', currentPage === pages.length - 1);
+
+  // restore inline photo if already loaded
+  if (currentPage === 2 && inlinePhotoSrc) {
+    const img = document.getElementById('inlinePhotoImg');
+    const ph  = document.getElementById('inlinePlaceholder');
+    if (img) { img.src = inlinePhotoSrc; img.style.display = 'block'; }
+    if (ph)  { ph.style.display = 'none'; }
+  }
+}
+
+function nextPage() { if(currentPage < pages.length - 1){ currentPage++; renderPage(); } }
+function prevPage() { if(currentPage > 0){ currentPage--; renderPage(); } }
+
+// ── STARS ──
+function makeStars(id, n) {
+  const c = document.getElementById(id); if(!c) return;
+  for(let i=0;i<n;i++){
+    const s = document.createElement('div'); s.className='star';
+    const sz = Math.random()*2.8+0.8;
+    s.style.cssText=`width:${sz}px;height:${sz}px;top:${Math.random()*100}%;left:${Math.random()*100}%;animation-delay:${Math.random()*3}s;animation-duration:${1.5+Math.random()*2}s;`;
+    c.appendChild(s);
+  }
+}
+makeStars('stars',65); makeStars('stars2',40);
+
+// ── MUSIC ──
+let musicOn = false;
+const music = document.getElementById('bgMusic');
+function toggleMusic(){
+  if(musicOn){ music.pause(); document.getElementById('musicBtn').textContent='🎵 Music'; }
+  else { music.play().catch(()=>{}); document.getElementById('musicBtn').textContent='🔇 Mute'; }
+  musicOn = !musicOn;
+}
+
+// ── POP PARTICLES ──
+const pops=['🌸','🌺','🌼','🌷','🌹','💐','🌻','🐱','😺','🐾','🐈','😻','❤️','💕','💖','💗','💝','💓'];
+function triggerPop(){
+  const layer = document.getElementById('pop-layer');
+  const cx = window.innerWidth/2, cy = window.innerHeight/2;
+  for(let i=0;i<80;i++){
+    setTimeout(()=>{
+      const el = document.createElement('span'); el.className='pop-item';
+      el.textContent = pops[Math.floor(Math.random()*pops.length)];
+      const a=Math.random()*Math.PI*2;
+      const d1=60+Math.random()*80, d2=160+Math.random()*180, d3=290+Math.random()*200;
+      const r1=Math.random()*360, r2=r1+180, r3=r2+90;
+      el.style.cssText=`left:${cx}px;top:${cy}px;font-size:${1.1+Math.random()*1.3}rem;
+        --dx1:${Math.cos(a)*d1}px;--dy1:${Math.sin(a)*d1}px;
+        --dx2:${Math.cos(a)*d2}px;--dy2:${Math.sin(a)*d2}px;
+        --dx3:${Math.cos(a)*d3}px;--dy3:${Math.sin(a)*d3}px;
+        --r1:${r1}deg;--r2:${r2}deg;--r3:${r3}deg;
+        animation-duration:${1.8+Math.random()*.8}s;
+        animation-delay:${Math.random()*.4}s;`;
+      layer.appendChild(el);
+      setTimeout(()=>el.remove(), 3200);
+    }, i*22);
+  }
+}
+
+// ── ENVELOPE ──
+let opened = false;
+function openEnvelope(){
+  if(opened) return; opened=true;
+  document.getElementById('envelopeWrap').classList.add('open');
+  const bow = document.getElementById('floatingBow');
+  bow.style.transition = 'opacity 0.4s';
+  bow.style.opacity = '0';
+  setTimeout(()=>{ bow.style.display='none'; }, 400);
+  triggerPop();
+  music.play().catch(()=>{}); musicOn=true;
+  document.getElementById('musicBtn').textContent='🔇 Mute';
+  setTimeout(()=>switchScreen('screen-envelope','screen-title'), 1150);
+}
+
+// ── NAVIGATION ──
+function switchScreen(a,b){
+  document.getElementById(a).classList.remove('active');
+  document.getElementById(b).classList.add('active');
+}
+function goToBook(){
+  document.querySelector('.screen.active').classList.remove('active');
+  document.getElementById('screen-book').classList.add('active');
+  renderPage();
+}
+function goToCats(){
+  switchScreen('screen-book','screen-cats');
+  triggerPop();
+  // sync photo to cat screen
+  if(inlinePhotoSrc){
+    document.getElementById('catsPhoto').src = inlinePhotoSrc;
+    document.getElementById('catsPhoto').style.display = 'block';
+    document.getElementById('catsPlaceholder').style.display = 'none';
+  }
+}
+
+// ── INLINE PHOTO (page 3) ──
+let inlinePhotoSrc = '';
+function loadInlinePhoto(e){
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    inlinePhotoSrc = ev.target.result;
+    const img = document.getElementById('inlinePhotoImg');
+    const ph  = document.getElementById('inlinePlaceholder');
+    if(img){ img.src = inlinePhotoSrc; img.style.display='block'; }
+    if(ph) { ph.style.display='none'; }
+    triggerPop();
+  };
+  r.readAsDataURL(f);
+}
+</script>
+</body>
+</html>
